@@ -1,0 +1,49 @@
+HELLO WORLD
+
+On the master
+
+Yaml file
+
+# hello-kubernetes.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-kubernetes
+spec:
+  type: LoadBalancer
+  externalIPs:
+  - 192.168.0.15
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: hello-kubernetes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-kubernetes
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-kubernetes
+  template:
+    metadata:
+      labels:
+        app: hello-kubernetes
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: paulbouwer/hello-kubernetes:1.8
+        ports:
+        - containerPort: 8080
+
+
+# send it to the cluster
+kubectl apply -f hello
+
+need to work on the loadbalancer
+
+#get the IP address
+kubectl get service hello-kubernetes

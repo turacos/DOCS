@@ -1,0 +1,14 @@
+Debian on Raspberry pi 4
+
+https://wiki.debian.org/RaspberryPi4
+https://raspi.debian.net/
+https://raspi.debian.net/tested-images/
+
+Use etcher or raspberry pi imager to write the image onto the sdcard or drive
+
+login : root without any password
+
+# Installing common softwares
+apt install wget curl gcc bison autoconf python golang etc...
+
+# sshd change the config to allow root to login or create a user instead

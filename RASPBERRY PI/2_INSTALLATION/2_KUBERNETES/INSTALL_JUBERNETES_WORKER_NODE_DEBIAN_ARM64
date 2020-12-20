@@ -1,0 +1,57 @@
+# Kubernetes installation
+
+On the worker
+
+
+#Prerequisites
+
+
+
+install containerd and kubeadm 
+
+# Add GPG Key
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg |  apt-key add -
+
+# ADD kubernetes repository
+cat <<EOF |  tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+apt-get update
+
+For the worker
+apt-get install kubelet kubeadm kubectl -y
+apt-mark hold kubelet kubeadm kubectl  
+
+
+Edit file or create it  /etc/default/kubelet 
+
+And add
+
+KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --container-runtime=remote --container-runtime-endpoint="unix:///var/run/containerd/containerd.sock"
+
+Join the master
+
+kubeadm join 192.168.0.15:6443 --token jm10ik.yxixa6zw06opef2i \
+--discovery-token-ca-cert-hash sha256:d382cd7c7b185594e9a94861371d0b6c0a815367b958070c0032051d7a6cae8f
+
+
+Once is joined the master
+
+kubectl get nodes on the master
+
+
+NAME            STATUS     ROLES                  AGE     VERSION
+kube1           NotReady   <none>                 2m4s    v1.20.1
+rpi4-20201112   Ready      control-plane,master   3h33m   v1.20.1
+
+
+
+
+
+
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+https://kubernetes.io/docs/tasks/access-application-cluster/list-all-running-container-images/
+https://www.tecmint.com/install-kubernetes-cluster-on-centos-7/
+https://aws.amazon.com/fr/premiumsupport/knowledge-center/eks-node-status-ready/
+https://stackoverflow.com/questions/52140852/kubeadm-join-fails-with-http-localhost10248-healthz-connection-refused

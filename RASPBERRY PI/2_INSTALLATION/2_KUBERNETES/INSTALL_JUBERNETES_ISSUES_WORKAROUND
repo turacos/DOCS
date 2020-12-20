@@ -1,0 +1,20 @@
+
+
+Issue on BTRFS 
+
+kubelet crash
+
+journal -xe kubelet
+
+déc. 20 18:21:22 kube1 kubelet[2539]: F1220 18:21:22.200696    2539 kubelet.go:1347] Failed to start ContainerManager failed to get rootfs info: failed to get device for dir "/var/lib/kubelet": could not find device with major: 0, minor: 22 in cached partitions map
+	
+
+workaround
+
+add this line to fstab
+/var/lib/kubelet /var/lib/kubelet none defaults,bind,nofail 0 0
+
+
+
+
+

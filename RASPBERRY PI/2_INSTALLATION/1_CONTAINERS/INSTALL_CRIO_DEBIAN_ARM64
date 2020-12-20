@@ -1,0 +1,30 @@
+#CRI-O on debian arm64
+
+All commands below are launched by root
+
+#CRI-O installation
+
+Installation on master and nodes
+
+#prerequesites pkg
+apt-get install -y apt-transport-https ca-certificates software-properties-common
+
+# Add GPG key
+
+# Add repository
+
+    
+# Update apt registery
+apt-get update
+
+# install containerd
+apt-get install -y cri-o 
+
+# configure cri-o
+
+
+# configure the Network (CNI)
+
+
+# Restart containerd
+systemctl restart cri-o

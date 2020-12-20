@@ -1,0 +1,65 @@
+# Kubernetes installation
+
+All commands below are launched by root
+
+# Prerequesites installation of a container system before proceed (containerd, docker, cri-o)
+
+kubernetes-xenial is the latest kubernetes stable distribution at this time
+
+# Add GPG Key
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg |  apt-key add -
+
+# ADD kubernetes repository
+cat <<EOF |  tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+apt-get update
+
+For the master
+apt-get install kubelet kubeadm kubectl -y
+apt-mark hold kubelet kubeadm kubectl 
+
+# configure env
+
+Edit file or create it  /etc/default/kubelet 
+
+And add
+
+KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --container-runtime=remote --container-runtime-endpoint="unix:///var/run/containerd/containerd.sock"
+
+kubelet will warning about this token, it should be configured from the config file not on the command line
+--cgroup-driver
+
+systemctl daemon-reload
+
+kubeadm init
+
+
+----
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.0.15:6443 --token jm10ik.yxixa6zw06opef2i \
+--discovery-token-ca-cert-hash sha256:d382cd7c7b185594e9a94861371d0b6c0a815367b958070c0032051d7a6cae8f
+
+----
+
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+https://kubernetes.io/docs/tasks/access-application-cluster/list-all-running-container-images/
+https://www.tecmint.com/install-kubernetes-cluster-on-centos-7/

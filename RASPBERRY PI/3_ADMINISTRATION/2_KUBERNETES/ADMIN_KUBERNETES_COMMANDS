@@ -1,0 +1,14 @@
+
+#Commands kubectl
+
+#pods
+
+kubectl get pods -A
+kubectl get pods -n kube-system -o wide
+
+
+#services
+kubectl get service -A
+
+#nodes
+kubectl get nodes

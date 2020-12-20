@@ -1,0 +1,38 @@
+# configure the Network (CNI)
+
+cat >/etc/cni/net.d/100-mynet-bridge.conf <<EOF
+{ 
+    "cniVersion": "0.3.0", 
+    "name": "mynet", 
+    "type": "bridge", 
+    "bridge": "cni0", 
+    "isGateway": true, 
+    "ipMasq": true, 
+    "ipam": { 
+        "type": "host-local", 
+        "subnet": "10.100.0.0/16", 
+        "routes": [ 
+            { "dst": "0.0.0.0/0" } 
+        ] 
+    } 
+}
+EOF
+
+
+cat > /etc/cni/net.d/200-loopback.conf <<EOF
+{ 
+    "cniVersion": "0.3.0", 
+    "type": "loopback" 
+}
+EOF
+
+
+
+Avec PLugins WEAVE
+
+export kubever=$(kubectl version | base64 | tr -d '\n')
+kubectl apply -f "https://cloud.^Cave.works/k8s/net?k8s-version=$kubever"
+
+reboot
+
+
