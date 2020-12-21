@@ -1,0 +1,114 @@
+# Create a private Docker Registry with authentication
+
+create a root directory for your registry services on your local server
+mkdir /opt/kregistry
+
+# Create certificates for testing purpose or skip this section if you have your own certificates
+
+mkdir -p <Where you store the certs folder>/certs
+
+Copy the .crt and .key files from the CA into the certs directory.
+The following steps assume that the files are named domain.crt and domain.key.
+
+#For testing we will gerate a self signed a certicates
+
+# Create a certicate key
+openssl genrsa -des3 -out registry_server.key 1024
+
+# Create a certicate  frcsr 
+openssl req -new -key registry_server.key -out registry_server.csr
+
+Country Name (2 letter code) [AU]:FR
+State or Province Name (full name) [Some-State]:France
+Locality Name (eg, city) []:Paris
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:FRCompany
+Organizational Unit Name (eg, section) []:Information Technology
+Common Name (e.g. server FQDN or YOUR name) []:private.kube.io
+Email Address []:gr at kube dot io
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+#remove password from certificate key
+cp registry_server.key registry_server.key.org
+openssl rsa -in registry_server.key.org -out registry_server.key
+
+# generate the certificate crt
+openssl x509 -req -days 365 -in registry_server.csr -signkey registry_server.key -out registry_server.crt
+
+# trust the certificate by the system
+cp certs/registry_server.crt /usr/local/share/ca-certificates/
+update-ca-certificates
+
+# For rollback purpose: if needed to remove the cerificate
+/usr/local/share/ca-certificates/registry_server.crt 
+update-ca-certificates --fresh
+
+systemctl daemon-reload
+systemctl restart docker
+
+# Note the FQDN decalred into the certificate, should be declared on your local DNS network or into the /etc/hosts file
+
+# Authentication methodologie use htpasswd
+
+# Generate htpasswd file
+
+mkdir <Where you store the certs folder>/auth
+
+# prerequisite if you want to use the htpasswd localy
+apt-get install apache2-utils
+
+# htpasswd
+#example
+htpasswd -Bbn username password  > htpasswd
+
+#or use docker
+docker run --rm --entrypoint htpasswd registry:2 -Bbn username password > htpasswd
+
+
+# start the private registry
+
+#  -v /mnt/kregistry/registry:/var/lib/registry  => we mapping the registry location to a specific mounting point on the local system
+#  -v /opt/kregistry/auth:/auth  -v /opt/kregistry/certs:/certs  => where you have store you certificates files
+
+docker run -d \
+  --restart=always \
+  --name kregistry \
+  -v /mnt/kregistry/registry:/var/lib/registry \
+  -v /opt/kregistry/auth:/auth \
+  -v /opt/kregistry/certs:/certs \
+  -e REGISTRY_AUTH=htpasswd \
+  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry_server.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/registry_server.key\
+  -p 443:443 \
+  registry:2
+  
+  
+# login to the registry
+docker login -u kubeadm private.kube.io
+root@kregistry:/mnt# docker login -u kubeadm private.kube.io
+Password:
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+# test your private registry
+
+#pull from docker an image for example busybox
+docker pull busybox
+
+# tag it 
+docker tag busybox private.kube.io/busybox
+
+# push it
+docker push private.kube.io/busybox
+
+
+https://docs.docker.com/registry/

@@ -1,0 +1,51 @@
+# Install DOCKER CE
+
+# Prerequisites packages
+apt-get install apt-transport-https ca-certificates gnupg-agent software-properties-common apache2-utils
+
+
+
+# Add GPG Key
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+
+# Add docker repository
+
+X86_64
+
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+   
+ARM64
+sudo add-apt-repository \
+   "deb [arch=arm64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+   
+   
+apt-get update
+apt-get install docker-ce docker-ce-cli containerd.io
+
+#Boot loader modification
+
+X86_64
+
+/etc/default/grub
+
+GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
+
+update-grub
+
+Raspberry ARM64
+/boot/cmdline.txt
+or
+/boot/firmware/cmdline.txt
+Add this at the end on the line
+cgroup_enable=memory swapaccount=1
+
+
+reboot
+
+
+https://docs.docker.com/engine/install/debian/
