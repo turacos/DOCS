@@ -1,0 +1,32 @@
+# Build MINIO docker image for armhf/v7 32bits plateform
+
+git clone https://github.com/dimianstudio/minio-arm.git
+
+cd minio-arm
+mv Dockerfile.armhf Dockerfile
+
+docker build -t minio-arm .
+
+# run your minio server for a nas environment
+
+docker run -p 9999:9000 --name homenas \
+ -e "MINIO_ACCESS_KEY=YOURTOKEN" \
+ -e "MINIO_SECRET_KEY=YOURSECRET" \
+ -v /local/storage/datas:/datas \
+minio-arm gateway nas /datas
+
+#from the browser you can navigate share your files
+http://your_server:9999/
+
+#Download mc from minio website for windows or linux
+
+#set an alias
+mc.exe alias set minio http://your_server:9999/ YOURTOKEN YOURSECRET
+
+#use mc like a command tool for cp mv ls etc...
+
+mc.exe --help
+
+
+https://github.com/dimianstudio/minio-arm
+https://docs.min.io/docs/minio-client-complete-guide.html
