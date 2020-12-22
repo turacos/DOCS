@@ -1,0 +1,72 @@
+# INSTALL a DNS server from Docker
+
+
+#pull the latest image from docker hub
+
+docker pull coredns/coredns:latest
+
+
+# configure your local server
+
+#create a configuration directory from your local server
+
+mkdir -p /opt/coredns/config
+
+#create your dns configuration file
+
+cd /opt/coredns/config
+vi Corefie
+
+# forward everything to global Internet dns servers
+.:53 {
+  forward . 1.1.1.1 9.9.9.9
+  log
+  errors
+}
+
+# resolution of our local area network
+mynet.local:53 {
+    file /root/db.mynet.local
+    log
+    errors
+}
+
+#Create a db file 
+cd
+/opt/coredns/config/
+
+vi db.mynet.local
+
+mynet.local.        IN  SOA dns.mynet.local. gr.kube.local. 1970010100 3600 1209600 3600
+
+dns.mynet.local.         IN  A          192.168.0.10
+mynas.mynet.local.     IN  A          192.168.0.10
+backup.mynet.local.    IN  CNAME  mynas.mynet.local.
+
+
+#start docker coredns container
+
+ docker run -d \
+ --name myprivatedns \
+ --restart=always \ 
+ --volume=/opt/coredns/config:/root/ \ 
+ -p 53:53/udp \
+ -p 53:53/tcp \
+ coredns/coredns \ 
+ -conf /root/Corefile
+ 
+ 
+# if needed bind the port 53 to your IP address
+# modify your resolv.conf file or your dhcp settings
+ 
+# you can disable system resolver
+systemctl disable resolvconf.service
+systemctl disable  systemd-resolved.service
+ 
+ # tests
+ 
+ dig
+ nslookup
+ ping
+ 
+ check docker logs
