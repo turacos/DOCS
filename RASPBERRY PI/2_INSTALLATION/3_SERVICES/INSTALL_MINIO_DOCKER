@@ -45,6 +45,7 @@ update-ca-certificates
 docker run -p 9999:443 --name homeminio \
 -v /local/storage/minio/certs/:/.minio/certs \
 -v /local/storage/datas:/datas \
+-e 'GODEBUG="x509ignoreCN=0"'
 -e 'MINIO_ACCESS_KEY=YOURTOKEN' \
 -e 'MINIO_SECRET_KEY=YOURSECRET' \
 minio-arm gateway --address ":443" nas /datas
@@ -58,6 +59,13 @@ Or use a reverse proxy like nginx with the TLS encryption onto a minio server wi
 
 you will need to accept the security alert when browsing from your browser
 
+ #Error with mc and TLS
+ mc: <ERROR> Unable to initialize new alias from the provided credentials.
+ x509: certificate relies on legacy Common Name field, use SANs or temporarily enable Common Name matching with GODEBUG=x509ignoreCN=0.
+
+#Workaround set this env variable from the shell or local system on windows 
+ GODEBUG=x509ignoreCN=0
+ 
 
 https://github.com/dimianstudio/minio-arm
 https://docs.min.io/docs/minio-client-complete-guide.html
