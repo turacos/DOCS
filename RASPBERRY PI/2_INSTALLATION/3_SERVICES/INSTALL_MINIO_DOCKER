@@ -28,5 +28,36 @@ mc.exe alias set minio http://your_server:9999/ YOURTOKEN YOURSECRET
 mc.exe --help
 
 
+# Add TLS encryption 
+
+#generate encypted keys
+
+# private key
+openssl genrsa -out private.key 2048
+
+#public key
+openssl req -x509 -nodes -key private.key -out public.crt
+
+cp public.crt /usr/local/share/ca-certificates/minio.crt
+update-ca-certificates
+
+
+docker run -p 9999:443 --name homeminio \
+-v /local/storage/minio/certs/:/.minio/certs \
+-v /local/storage/datas:/datas \
+-e 'MINIO_ACCESS_KEY=YOURTOKEN' \
+-e 'MINIO_SECRET_KEY=YOURSECRET' \
+minio-arm gateway --address ":443" nas /datas
+
+#from the browser you can navigate share your files from the https
+https://your_server:9999/
+
+port 9999 could be change to 443 
+
+Or use a reverse proxy like nginx with the TLS encryption onto a minio server without TLS
+
+you will need to accept the security alert when browsing from your browser
+
+
 https://github.com/dimianstudio/minio-arm
 https://docs.min.io/docs/minio-client-complete-guide.html
