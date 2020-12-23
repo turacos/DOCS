@@ -45,7 +45,6 @@ update-ca-certificates
 docker run -p 9999:443 --name homeminio \
 -v /local/storage/minio/certs/:/.minio/certs \
 -v /local/storage/datas:/datas \
--e 'GODEBUG="x509ignoreCN=0"'
 -e 'MINIO_ACCESS_KEY=YOURTOKEN' \
 -e 'MINIO_SECRET_KEY=YOURSECRET' \
 minio-arm gateway --address ":443" nas /datas
