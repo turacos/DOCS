@@ -73,7 +73,7 @@ $TTL    604800
 
       IN      NS      ns.mynet.local.
 10   IN      PTR     ns.mynet.local.
-11   IN      PTR     nas.mynet.local.
+11   IN      PTR     mynas.mynet.local.
 
 
 #full config for better understanding
@@ -88,7 +88,7 @@ $TTL    604800
 
       IN      NS      ns.mynet.local.
 10.0.168.192.in-addr.arpa.    IN      PTR     ns.mynet.local.
-11.0.168.192.in-addr.arpa.    IN      PTR     nas.mynet.local.
+11.0.168.192.in-addr.arpa.    IN      PTR     mynas.mynet.local.
 
 #start docker coredns container
 
@@ -119,19 +119,19 @@ systemctl disable  systemd-resolved.service
 
 # FQDN resolving
 #with nslookup
-nslookup nas.mynet.local 192.168.0.10
+nslookup mynas.mynet.local 192.168.0.10
 Serveur :   ns.mynet.local
 Address:  192.168.0.10
 
 Nom :    ns.mynet.local
 Address:  192.168.0.11
-Aliases:  nas.mynet.local
+Aliases:  mynas.mynet.local
 
 # with dig
-dig @192.168.0.10 nas.mynet.local
+dig @192.168.0.10 mynas.mynet.local
 ....
 ;; ANSWER SECTION:
-nas.mynet.local.       3600    IN      A   192.168.0.11
+mynas.mynet.local.       3600    IN      A   192.168.0.11
 .....
 
 # IP addr resolving
@@ -141,15 +141,20 @@ nslookup 192.168.0.11 192.168.0.10
 Serveur :   ns.mynet.local
 Address:  192.168.0.10
 
-Nom :    nas.mynet.local
+Nom :   mynas.mynet.local
 Address:  192.168.0.11
 
  #with dig
  dig  @192.168.0.10 -x 192.168.0.11
  .....
  ;; ANSWER SECTION:
-11.0.168.192.in-addr.arpa. 604800 IN   PTR     nas.mynet.local.
+11.0.168.192.in-addr.arpa. 604800 IN   PTR     mynas.mynet.local.
 .....
 
  check docker logs
  docker container logs myprivatedns
+ 
+ 
+ LINKS
+ https://awesomeopensource.com/project/coredns/coredns
+ https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/reverse-zones/
