@@ -156,5 +156,6 @@ Address:  192.168.0.11
  
  
  LINKS
+ https://wiki.debian.org/Bind9#File_.2Fetc.2Fbind.2Fnamed.conf.default-zones
  https://awesomeopensource.com/project/coredns/coredns
  https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/reverse-zones/
