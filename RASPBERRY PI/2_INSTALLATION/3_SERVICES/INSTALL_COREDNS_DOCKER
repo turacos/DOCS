@@ -154,8 +154,65 @@ Address:  192.168.0.11
  check docker logs
  docker container logs myprivatedns
  
+ #Furher more 
+ 
+# Chaos plugin
+ 
+ # to the Corefile you can add this line section global zone
+.  {
+....
+    chaos MYDNS myemail@mydomain
+....
+}
+
+#dig @localhost CH TXT version.bind
+...
+;; ANSWER SECTION:
+version.bind.		0	CH	TXT	"MYDNS"
+...
+
+#Cache plugin
+#this plugin will cache the dns queries for the global zone, default is 3600 seconds 
+
+. {
+....
+cache
+....
+}
+
+#monitoring with prometheus
+. {
+....
+    prometheus <mypromeheusserver>:<PORT>
+....
+}
+
+# reload the config file, if you have a lot of new servers to manage etc...
+#default reload each 30 seconds
+. {
+....
+    reload
+    erratic
+....
+}
+
+#Use tls as a forwarder
+#prerequisite install ca-certificates package on the server
+# this configuration will encrypt all dns queries to cloudfare dns servers
+
+. {
+...
+   forward . tls://1.1.1.1 tls://1.0.0.1 {
+        tls_servername tls.cloudflare-dns.com
+    }
+...
+}
  
  LINKS
  https://wiki.debian.org/Bind9#File_.2Fetc.2Fbind.2Fnamed.conf.default-zones
  https://awesomeopensource.com/project/coredns/coredns
  https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/reverse-zones/
+ https://coredns.io/plugins/chaos/
+ https://coredns.io/plugins/metrics/
+ https://coredns.io/plugins/reload/
+ https://github.com/coredns/coredns/issues/1650
