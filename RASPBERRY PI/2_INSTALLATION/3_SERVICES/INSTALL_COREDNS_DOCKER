@@ -213,7 +213,7 @@ cache
 
 . {
 ...
-    forward . 127.0.0.1:5301 127.0.0.1:5302
+    forward . 127.0.0.1:5301 127.0.0.1:5302 127.0.0.1:5303
 ...
 }
 
@@ -231,6 +231,12 @@ cache
     }
 }
 
+.:5303 {
+    forward . 208.67.222.222 208.67.220.220  {
+        tls_servername doh.opendns.com
+        health_check 5s
+    }
+}
 
  
  LINKS
