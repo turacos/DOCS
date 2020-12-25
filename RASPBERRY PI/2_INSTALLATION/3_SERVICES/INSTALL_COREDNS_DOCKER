@@ -247,3 +247,4 @@ cache
  https://coredns.io/plugins/metrics/
  https://coredns.io/plugins/reload/
 https://github.com/coredns/coredns/tree/master/plugin/forward
+https://support.opendns.com/hc/en-us/articles/360038086532-Using-DNS-over-HTTPS-DoH-with-OpenDNS
