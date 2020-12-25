@@ -37,12 +37,58 @@ cd
 
 vi db.mynet.local
 
-mynet.local.        IN  SOA dns.mynet.local. gr.kube.local. 1970010100 3600 1209600 3600
+mynet.local.        IN  SOA dns.mynet.local. gr.mynet.local. 1970010100 3600 1209600 3600
 
 dns.mynet.local.         IN  A          192.168.0.10
-mynas.mynet.local.     IN  A          192.168.0.10
+mynas.mynet.local.     IN  A          192.168.0.11
 backup.mynet.local.    IN  CNAME  mynas.mynet.local.
 
+
+# create a reverse zone
+
+cd /opt/coredns/config
+vi Corefie
+
+#Add the following lines
+
+192.168.0.0/24 {
+  file /root/db.192
+  log
+  errors
+}
+
+#Coredns will translate this zone to 192.168.0.0/24 = 0.168.192.in-addr.arpa.
+
+# the db file /root/db.192
+
+# this is a short writing db reverse file
+$TTL    604800
+@   IN      SOA     ns.mynet.local. admin.mynet.local. (
+                              2
+                         604800
+                          86400
+                        2419200
+                         604800 )
+;
+
+      IN      NS      ns.mynet.local.
+10   IN      PTR     ns.mynet.local.
+11   IN      PTR     nas.mynet.local.
+
+
+#full config for better understanding
+$TTL    604800
+0.168.192.in-addr.arpa.   IN      SOA     ns.mynet.local. admin.mynet.local. (
+                              2
+                         604800
+                          86400
+                        2419200
+                         604800 )
+;
+
+      IN      NS      ns.mynet.local.
+10.0.168.192.in-addr.arpa.    IN      PTR     ns.mynet.local.
+11.0.168.192.in-addr.arpa.    IN      PTR     nas.mynet.local.
 
 #start docker coredns container
 
@@ -69,4 +115,41 @@ systemctl disable  systemd-resolved.service
  nslookup
  ping
  
+ #example
+
+# FQDN resolving
+#with nslookup
+nslookup nas.mynet.local 192.168.0.10
+Serveur :   ns.mynet.local
+Address:  192.168.0.10
+
+Nom :    ns.mynet.local
+Address:  192.168.0.11
+Aliases:  nas.mynet.local
+
+# with dig
+dig @192.168.0.10 nas.mynet.local
+....
+;; ANSWER SECTION:
+nas.mynet.local.       3600    IN      A   192.168.0.11
+.....
+
+# IP addr resolving
+
+# with nslookup
+nslookup 192.168.0.11 192.168.0.10
+Serveur :   ns.mynet.local
+Address:  192.168.0.10
+
+Nom :    nas.mynet.local
+Address:  192.168.0.11
+
+ #with dig
+ dig  @192.168.0.10 -x 192.168.0.11
+ .....
+ ;; ANSWER SECTION:
+11.0.168.192.in-addr.arpa. 604800 IN   PTR     nas.mynet.local.
+.....
+
  check docker logs
+ docker container logs myprivatedns

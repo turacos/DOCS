@@ -1,0 +1,20 @@
+# Create SSL certificate for local use
+
+openssl genrsa -des3 -out yourCA.key 2048
+openssl req -x509 -new -nodes -key yourCA.key -sha256 -days 1024 -out yourCA.pem
+
+#First step become a certificate authority
+
+
+#second step authorize your browser
+run->MMC
+FILE->Add/REmove Snap in...
+Add certificate
+Select Computer Account
+Next
+Select Local computer
+
+#third step sign your own certificate with your CA
+
+openssl req -new -sha256 -nodes -out kube.local.csr -newkey rsa:2048 -keyout kube.local.key
+openssl x509 -req -in kube.local.csr -CA ../CA/kubeCA.pem -CAkey ../CA/kubeCA.key -CAcreateserial -out kube.local.crt -days 1024 -sha256 -extensions "authorityKeyIdentifier=keyid,issuer\n basicConstraints=CA:FALSE\n keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment\n  subjectAltName=DNS:kube.local"
