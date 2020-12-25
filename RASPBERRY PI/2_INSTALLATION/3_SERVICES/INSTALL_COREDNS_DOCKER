@@ -204,9 +204,34 @@ cache
 ...
    forward . tls://1.1.1.1 tls://1.0.0.1 {
         tls_servername tls.cloudflare-dns.com
+	health_check 5s
     }
 ...
 }
+
+#or with multiple DoT upstreams with different tls_servername
+
+. {
+...
+    forward . 127.0.0.1:5301 127.0.0.1:5302
+...
+}
+
+.:5301 {
+    forward . 9.9.9.9 {
+        tls_servername dns.quad9.net
+	health_check 5s
+    }
+}
+
+.:5302 {
+    forward . 1.1.1.1 1.0.0.1 {
+        tls_servername cloudflare-dns.com
+	health_check 5s
+    }
+}
+
+
  
  LINKS
  https://wiki.debian.org/Bind9#File_.2Fetc.2Fbind.2Fnamed.conf.default-zones
@@ -215,4 +240,4 @@ cache
  https://coredns.io/plugins/chaos/
  https://coredns.io/plugins/metrics/
  https://coredns.io/plugins/reload/
- https://github.com/coredns/coredns/issues/1650
+https://github.com/coredns/coredns/tree/master/plugin/forward
