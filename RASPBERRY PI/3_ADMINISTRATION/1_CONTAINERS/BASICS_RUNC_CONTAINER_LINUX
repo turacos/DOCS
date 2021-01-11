@@ -1,0 +1,42 @@
+#BASICS_RUNC_CONTAINER_LINUX
+
+# SETUP THE CONTAINER
+
+# Use the network into a runc container
+
+#we will create an alpine linux test container
+
+cd /root
+mkdir test
+cd test
+# create the configuration template to the container
+runc spec --rootless
+#edit the configuration file
+vi config.json
+add the following lines into the namespace section (Network device created from BRIDGE_NETWORK_NAMESPACE_LINUX)
+
+{
+	"type": "network",
+	"path": "/var/run/netns/test-ns"
+}
+
+#note withtout adding the path to the network namespace
+# this container will using the host devices, like a chroot 
+
+#download the container rootfs
+wget http://dl-cdn.alpinelinux.org/alpine/v3.12/releases/x86_64/alpine-minirootfs-3.12.0-x86_64.tar.gz
+# create the directory rootfs into the alpine directory
+mkdir rootfs
+# untar the alpine rootfs archive 
+tar xzf alpine-minirootfs-3.12.0-x86_64.tar.gz -c rootfs
+
+# run the container
+runc run test
+#ip addr 
+
+# from another terminal 
+ps -efa|grep runc
+root      1100   807  0 14:01 pts/1    00:00:00 runc run test
+
+# ping the container
+ping 192.168.80.100
